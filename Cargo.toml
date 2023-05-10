@@ -5,7 +5,7 @@ authors = ["ParallelChain Lab <info@parallelchain.io>"]
 edition = "2018"
 description = "Client library for the ParallelChain Fullnode RPC"
 repository = "https://github.com/parallelchain-io/pchain-client-rust"
-keywords = ["blockchain", "parallelchain", "crypto", "library"]
+keywords = ["blockchain", "parallelchain", "crypto", "library", "client"]
 categories = ["cryptography::cryptocurrencies"]
 license = "Apache-2.0"
 
