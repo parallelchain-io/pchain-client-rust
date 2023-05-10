@@ -3,8 +3,7 @@
     Licensed under the Apache License, Version 2.0: http://www.apache.org/licenses/LICENSE-2.0
 */
 
-//! Implementation of methods which take care of networking with a ParallelChain 
-//! fullnode provider with this library.
+//! HTTP networking with specific fullnodes.
 
 use reqwest;
 

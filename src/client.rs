@@ -3,28 +3,16 @@
     Licensed under the Apache License, Version 2.0: http://www.apache.org/licenses/LICENSE-2.0
 */
 
-//! Implementation of the interface to instantiating `pchain_client_rs`.
+//! Client struct with methods corresponding to each and every fullnode RPC.
 
-use std::ops::Deref;
-
-use pchain_types::{Serializable, Deserializable};
-use crate::error::{
-    HttpError as PchainClientError, HttpErrorResponse,
-};
+use pchain_types::serialization::{Serializable, Deserializable};
+use pchain_types::blockchain::Transaction;
+use crate::error::{ HttpError as PChainClientError, HttpErrorResponse };
 use crate::networking::Networking;
 
 /// [Client] defines functions to communicate with ParallelChain RPC endpoints. 
 /// User requires to provide corresponding request stuct in pchain_types in order
 /// to get correct response.
-/// 
-/// Usage:
-/// Instantiate Client
-///```no_run
-/// use pchain_client_rs::Client;
-/// 
-/// let client = Client::new("<FULLNODE_PROVIDER_URL>");
-/// ```
-///  
 pub struct Client {
     /// `networking` denotes instance of reqwest::Client.
     networking: Networking
@@ -49,30 +37,28 @@ impl Client {
 
     /// `provider` returns the current network provider for Client, and check if 
     /// the current provider is up. 
+    /// 
     /// # Return
-    /// Truple of (provider url, boolean). If server is up, returns true, otherwise returns false.
+    /// Tuple of (provider url, boolean). If server is up, returns true, otherwise returns false.
     pub async fn is_provider_up(&self) -> (String, bool) {
         self.networking.is_provider_up().await
     }
     
-    /// `submit_transaction` submits a transaction to ParallelChain.
-    /// # Arguments
-    /// * `signed_tx` - pchain_types::SignedTx
-    /// 
+    /// Submit a transaction.
     pub async fn submit_transaction(
         &self, 
-        signed_tx: &pchain_types::SignedTx
+        signed_tx: &Transaction
     ) -> Result<pchain_types::rpc::SubmitTransactionResponse, HttpErrorResponse> { 
-        let data = pchain_types::Transaction::serialize(signed_tx.deref());  
+        let data = Transaction::serialize(&signed_tx);  
 
         let raw_bytes = self
             .networking
             .post_response("submit_transaction", data)
             .await
-            .map_err(|e| PchainClientError::new(e.to_string()))?; 
+            .map_err(|e| PChainClientError::new(e.to_string()))?; 
 
         let response: pchain_types::rpc::SubmitTransactionResponse = pchain_types::rpc::SubmitTransactionResponse::deserialize(&raw_bytes)
-        .map_err(|e| PchainClientError::new(e.to_string()))?;  
+        .map_err(|e| PChainClientError::new(e.to_string()))?;  
         
         Ok(response)
     }
@@ -91,10 +77,10 @@ impl Client {
             .networking
             .post_response("state", data)
             .await
-            .map_err(|e| PchainClientError::new(e.to_string()))?; 
+            .map_err(|e| PChainClientError::new(e.to_string()))?; 
 
         let state_response: pchain_types::rpc::StateResponse = pchain_types::rpc::StateResponse::deserialize(&raw_bytes)
-        .map_err(|e| PchainClientError::new(e.to_string()))?;    
+        .map_err(|e| PChainClientError::new(e.to_string()))?;    
 
         Ok(state_response)
     }
@@ -113,10 +99,10 @@ impl Client {
             .networking
             .post_response("view", data)
             .await
-            .map_err(|e| PchainClientError::new(e.to_string()))?; 
+            .map_err(|e| PChainClientError::new(e.to_string()))?; 
 
         let state_response: pchain_types::rpc::ViewResponse = pchain_types::rpc::ViewResponse::deserialize(&raw_bytes)
-        .map_err(|e| PchainClientError::new(e.to_string()))?;    
+        .map_err(|e| PChainClientError::new(e.to_string()))?;    
 
         Ok(state_response)
     }
@@ -135,10 +121,10 @@ impl Client {
             .networking
             .post_response("validator_sets", data)
             .await
-            .map_err(|e| PchainClientError::new(e.to_string()))?; 
+            .map_err(|e| PChainClientError::new(e.to_string()))?; 
 
         let response: pchain_types::rpc::ValidatorSetsResponse = pchain_types::rpc::ValidatorSetsResponse::deserialize(&raw_bytes)
-        .map_err(|e| PchainClientError::new(e.to_string()))?;    
+        .map_err(|e| PChainClientError::new(e.to_string()))?;    
 
         Ok(response)
     }
@@ -157,10 +143,10 @@ impl Client {
             .networking
             .post_response("pools", data)
             .await
-            .map_err(|e| PchainClientError::new(e.to_string()))?; 
+            .map_err(|e| PChainClientError::new(e.to_string()))?; 
 
         let response: pchain_types::rpc::PoolsResponse = pchain_types::rpc::PoolsResponse::deserialize(&raw_bytes)
-        .map_err(|e| PchainClientError::new(e.to_string()))?;    
+        .map_err(|e| PChainClientError::new(e.to_string()))?;    
 
         Ok(response)
     }
@@ -179,10 +165,10 @@ impl Client {
             .networking
             .post_response("stakes", data)
             .await
-            .map_err(|e| PchainClientError::new(e.to_string()))?; 
+            .map_err(|e| PChainClientError::new(e.to_string()))?; 
 
         let response: pchain_types::rpc::StakesResponse = pchain_types::rpc::StakesResponse::deserialize(&raw_bytes)
-        .map_err(|e| PchainClientError::new(e.to_string()))?;    
+        .map_err(|e| PChainClientError::new(e.to_string()))?;    
 
         Ok(response)
     }
@@ -201,10 +187,10 @@ impl Client {
             .networking
             .post_response("deposits", data)
             .await
-            .map_err(|e| PchainClientError::new(e.to_string()))?; 
+            .map_err(|e| PChainClientError::new(e.to_string()))?; 
 
         let response: pchain_types::rpc::DepositsResponse = pchain_types::rpc::DepositsResponse::deserialize(&raw_bytes)
-        .map_err(|e| PchainClientError::new(e.to_string()))?;    
+        .map_err(|e| PChainClientError::new(e.to_string()))?;    
 
         Ok(response)
     }
@@ -223,10 +209,10 @@ impl Client {
             .networking
             .post_response("block", data)
             .await
-            .map_err(|e| PchainClientError::new(e.to_string()))?; 
+            .map_err(|e| PChainClientError::new(e.to_string()))?; 
 
         let response: pchain_types::rpc::BlockResponse = pchain_types::rpc::BlockResponse::deserialize(&raw_bytes)
-        .map_err(|e| PchainClientError::new(e.to_string()))?;    
+        .map_err(|e| PChainClientError::new(e.to_string()))?;    
 
         Ok(response)
     }
@@ -245,10 +231,10 @@ impl Client {
             .networking
             .post_response("block_header", data)
             .await
-            .map_err(|e| PchainClientError::new(e.to_string()))?; 
+            .map_err(|e| PChainClientError::new(e.to_string()))?; 
 
         let response: pchain_types::rpc::BlockHeaderResponse = pchain_types::rpc::BlockHeaderResponse::deserialize(&raw_bytes)
-        .map_err(|e| PchainClientError::new(e.to_string()))?;    
+        .map_err(|e| PChainClientError::new(e.to_string()))?;    
 
         Ok(response)
     }
@@ -267,10 +253,10 @@ impl Client {
             .networking
             .post_response("block_height_by_hash", data)
             .await
-            .map_err(|e| PchainClientError::new(e.to_string()))?; 
+            .map_err(|e| PChainClientError::new(e.to_string()))?; 
 
         let response: pchain_types::rpc::BlockHeightByHashResponse = pchain_types::rpc::BlockHeightByHashResponse::deserialize(&raw_bytes)
-        .map_err(|e| PchainClientError::new(e.to_string()))?;    
+        .map_err(|e| PChainClientError::new(e.to_string()))?;    
 
         Ok(response)
     }
@@ -289,10 +275,10 @@ impl Client {
             .networking
             .post_response("block_hash_by_height", data)
             .await
-            .map_err(|e| PchainClientError::new(e.to_string()))?; 
+            .map_err(|e| PChainClientError::new(e.to_string()))?; 
 
         let response: pchain_types::rpc::BlockHashByHeightResponse = pchain_types::rpc::BlockHashByHeightResponse::deserialize(&raw_bytes)
-        .map_err(|e| PchainClientError::new(e.to_string()))?;    
+        .map_err(|e| PChainClientError::new(e.to_string()))?;    
 
         Ok(response)
     }
@@ -306,10 +292,10 @@ impl Client {
             .networking
             .get_response("highest_committed_block")
             .await
-            .map_err(|e| PchainClientError::new(e.to_string()))?; 
+            .map_err(|e| PChainClientError::new(e.to_string()))?; 
 
         Ok(pchain_types::rpc::HighestCommittedBlockResponse::deserialize(&raw_bytes)
-                .map_err(|e| PchainClientError::new(e.to_string()))?)
+                .map_err(|e| PChainClientError::new(e.to_string()))?)
     }
 
     /// `transaction` gets transaction by specified tx hash, include receipt or not.
@@ -326,10 +312,10 @@ impl Client {
             .networking
             .post_response("transaction", data)
             .await
-            .map_err(|e| PchainClientError::new(e.to_string()))?; 
+            .map_err(|e| PChainClientError::new(e.to_string()))?; 
 
         let response: pchain_types::rpc::TransactionResponse = pchain_types::rpc::TransactionResponse::deserialize(&raw_bytes)
-        .map_err(|e| PchainClientError::new(e.to_string()))?;    
+        .map_err(|e| PChainClientError::new(e.to_string()))?;    
 
         Ok(response)
     }
@@ -348,10 +334,10 @@ impl Client {
             .networking
             .post_response("receipt", data)
             .await
-            .map_err(|e| PchainClientError::new(e.to_string()))?; 
+            .map_err(|e| PChainClientError::new(e.to_string()))?; 
 
         let response: pchain_types::rpc::ReceiptResponse = pchain_types::rpc::ReceiptResponse::deserialize(&raw_bytes)
-        .map_err(|e| PchainClientError::new(e.to_string()))?;    
+        .map_err(|e| PChainClientError::new(e.to_string()))?;    
 
         Ok(response)
     }
@@ -370,10 +356,10 @@ impl Client {
             .networking
             .post_response("transaction_position", data)
             .await
-            .map_err(|e| PchainClientError::new(e.to_string()))?; 
+            .map_err(|e| PChainClientError::new(e.to_string()))?; 
 
         let response: pchain_types::rpc::TransactionPositionResponse = pchain_types::rpc::TransactionPositionResponse::deserialize(&raw_bytes)
-        .map_err(|e| PchainClientError::new(e.to_string()))?;    
+        .map_err(|e| PChainClientError::new(e.to_string()))?;    
 
         Ok(response)
     }

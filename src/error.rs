@@ -3,7 +3,7 @@
     Licensed under the Apache License, Version 2.0: http://www.apache.org/licenses/LICENSE-2.0
 */
 
-//! Implementation of methods which perform error handling for this library.
+//! Error handling for this library, including error printing.
 
 /// HttpError transform the http error code (integer in data type string) received from standatd code to human readable string.
 #[derive(Debug, Clone, Copy)]
@@ -87,7 +87,5 @@ impl Into<String> for  ClientError {
         }
     }
 }
-
-
 
 pub type HttpErrorResponse =  String;
