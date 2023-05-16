@@ -5,8 +5,6 @@
 
 //! HTTP networking with specific fullnodes.
 
-use reqwest;
-
 /// [Networking] houses all HTTP methods used by the Client 
 /// to serve responses to the user.
 pub(crate) struct Networking {
@@ -17,7 +15,8 @@ pub(crate) struct Networking {
 }
 
 impl Networking {
-    /// `new` creates a new network provider for Client. Panic if failed to initialized TLS backend connection.
+    /// `new` creates a new network provider for Client. Panics if failed to initialized TLS backend connection.
+    /// 
     ///  Timeout setting for the Client:
     ///     - connect : 10 secs
     ///     - read and write operations: 30 secs
@@ -37,7 +36,7 @@ impl Networking {
         self.provider = url.to_string();
     }
 
-    /// `get_provider_status` sends a GET request to the network provider to check if 
+    /// `is_provider_up` sends a GET request to the network provider to check if 
     /// the current provider is up. 
     /// 
     pub async fn is_provider_up(&self) -> (String, bool) {
@@ -55,10 +54,11 @@ impl Networking {
         self.client.post(request_url).body(body).send().await
     }
 
-    // `post_response` is a helper to return server side response from HTTP `POST methods` defined in this namespace.
-    // # Arguments
-    // * `request_url` - The request URL
-    // * `data` - Data of generic type serialized to vector of bytes
+    /// `post_response` is a helper to return server side responses from HTTP `POST methods` defined in this namespace.
+    /// # Arguments
+    /// * `request_url` - The request URL
+    /// * `data` - Vector of bytes serialized from generic types
+    /// 
     pub async fn post_response(&self, request_url: &str, data: Vec<u8>) -> Result<bytes::Bytes, String> {
         let url = format!("{}/{}", &self.provider, request_url);
         
@@ -73,8 +73,7 @@ impl Networking {
                         .bytes().await.map_err(|e| e.to_string())?)
             },
             _ => {
-                return Err(response
-                                .text().await.map_err(|e| e.to_string())?);
+                Err(response.text().await.map_err(|e| e.to_string())?)
             }
         }
     }
@@ -87,7 +86,7 @@ impl Networking {
         self.client.get(request_url).send().await
     }
 
-    // `get_response` is a helper to return server side response from HTTP `GET methods` defined in this namespace.
+    // `get_response` is a helper to return server side responses from HTTP `GET methods` defined in this namespace.
     // # Arguments
     // * `request_url` - The request URL 
     // 
@@ -104,8 +103,7 @@ impl Networking {
                         .bytes().await.map_err(|e| e.to_string())?)
             },
             _ => {
-                return Err(response
-                                .text().await.map_err(|e| e.to_string())?);
+                Err(response.text().await.map_err(|e| e.to_string())?)
             }
         }
     }
