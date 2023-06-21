@@ -39,7 +39,7 @@ pub(crate) fn new(error_code: String) -> HttpErrorResponse {
 // 
 fn response(error_code: u16) -> HttpErrorResponse {
     match error_code {
-        response_code::status400::INPUT_DECODE_FAILURE => String::from("Input query parameter is not a pchain_types::Base64URL encoded string."),
+        response_code::status400::INPUT_DECODE_FAILURE => String::from("Input query parameter is not a base64url encoded string."),
         response_code::status400::INCORRECT_URL_AND_QUERY_PARAMS => String::from("Incorrect url or query parameters."),
         response_code::status500::VIEW_SERVICE_CHANNEL_ERROR => String::from("Internal Server Error. Server busy and failed to handle new request."),
         response_code::status500::VIEW_SERVICE_REQUEST_TIMEOUT => String::from("Internal Server Error. Request Timeout"),
