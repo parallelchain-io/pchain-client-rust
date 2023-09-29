@@ -7,6 +7,9 @@
 
 /// [Networking] houses all HTTP methods used by the Client 
 /// to serve responses to the user.
+///     
+use async_trait::async_trait;
+
 pub(crate) struct Networking {
     /// `provider` denotes current ParallelChain Fullnode Provider URL.
     provider: String,
@@ -36,13 +39,19 @@ impl Networking {
         self.provider = url.to_string();
     }
 
+    /// `get_provider` get current network provider base url.
+    /// 
+    pub fn get_provider(&self) -> String {
+        self.provider.clone()
+    }
+
     /// `is_provider_up` sends a GET request to the network provider to check if 
     /// the current provider is up. 
     /// 
-    pub async fn is_provider_up(&self) -> (String, bool) {
+    pub async fn is_provider_up(&self) -> bool {
         let response = self.get_response("").await;
 
-        (self.provider.clone(), response.is_ok())
+        response.is_ok()
     }
     
     /// `post_request` sends a POST request to the network provider for Client.
@@ -108,4 +117,21 @@ impl Networking {
         }
     }
 }
-    
+
+#[async_trait]
+pub trait NetworkProvider {
+    /// assigns new network provider for Client.
+    /// 
+    /// # Arguments
+    /// * `rpc_base_url` - base URL of Parallelchain RPC endpoints
+    fn set_provider(&mut self, rpc_base_url: &str);
+
+    /// get current network provider base url.
+    fn get_provider(&self) -> String;
+
+    /// check if the current provider is up. 
+    /// 
+    /// # Return
+    /// true if server is up, otherwise returns false.
+    async fn is_provider_up(&self) -> bool;
+}

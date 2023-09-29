@@ -3,53 +3,49 @@
     Licensed under the Apache License, Version 2.0: http://www.apache.org/licenses/LICENSE-2.0
 */
 
-//! Client struct with methods corresponding to each and every fullnode RPC.
-
+use async_trait::async_trait;
+use pchain_types::blockchain::TransactionV1;
 use pchain_types::serialization::{Serializable, Deserializable};
-use pchain_types::blockchain::Transaction;
 use crate::error::{ self as PChainClientError, HttpErrorResponse };
-use crate::networking::Networking;
+use crate::networking::{Networking, NetworkProvider};
 
-/// [Client] defines functions to communicate with ParallelChain RPC endpoints. 
-/// Users are required to provide corresponding [request](pchain_types::rpc) specified in pchain_types
-/// in order to get a correct response.
-pub struct Client {
+/// Client with methods corresponding to each and every fullnode RPC V1.
+pub struct ClientV1 {
     /// `networking` denotes instance of reqwest::Client.
-    networking: Networking
+    networking: Networking,
 }
 
-impl Client {
+#[async_trait]
+impl NetworkProvider for ClientV1 {
+    fn set_provider(&mut self, rpc_base_url: &str) {
+        self.networking.set_provider(rpc_base_url);
+    }
+
+    fn get_provider(&self) -> String {
+        self.networking.get_provider()
+    }
+
+    async fn is_provider_up(&self) -> bool {
+        self.networking.is_provider_up().await
+    }
+}
+
+impl ClientV1 {
     /// `new` creates a new instance of a pchain_client given a network provider.
     /// # Arguments
     /// * `rpc_base_url` - base URL of Parallelchain RPC endpoints
     /// 
     pub fn new(rpc_base_url: &str) -> Self {
-        Self { networking: Networking::new(String::from(rpc_base_url)) }
-    }
-
-    /// `set_provider` assigns new network provider for Client.
-    /// # Arguments
-    /// * `rpc_base_url` - base URL of Parallelchain RPC endpoints
-    /// 
-    pub fn set_provider(&mut self, rpc_base_url: &str) {
-        self.networking.set_provider(rpc_base_url);
-    }
-
-    /// `is_provider_up` returns the current network provider for Client, and check if 
-    /// the current provider is up. 
-    /// 
-    /// # Return
-    /// Tuple of (provider url, boolean). Returns true if server is up, otherwise returns false.
-    pub async fn is_provider_up(&self) -> (String, bool) {
-        self.networking.is_provider_up().await
+        Self { networking: Networking::new(String::from(rpc_base_url))}
     }
     
     /// `submit_transaction` sends request to submit a transaction.
     pub async fn submit_transaction(
         &self, 
-        signed_tx: &Transaction
-    ) -> Result<pchain_types::rpc::SubmitTransactionResponse, HttpErrorResponse> { 
-        let data = Transaction::serialize(signed_tx);  
+        tx: &TransactionV1
+    ) -> Result<pchain_types::rpc::SubmitTransactionResponseV1, HttpErrorResponse> { 
+        let request = pchain_types::rpc::SubmitTransactionRequestV1{ transaction: tx.clone() };
+        let data = pchain_types::rpc::SubmitTransactionRequestV1::serialize(&request); 
 
         let raw_bytes = self
             .networking
@@ -57,7 +53,7 @@ impl Client {
             .await
             .map_err(PChainClientError::new)?; 
 
-        let response: pchain_types::rpc::SubmitTransactionResponse = pchain_types::rpc::SubmitTransactionResponse::deserialize(&raw_bytes)
+        let response: pchain_types::rpc::SubmitTransactionResponseV1 = pchain_types::rpc::SubmitTransactionResponseV1::deserialize(&raw_bytes)
         .map_err(|e| PChainClientError::new(e.to_string()))?;  
         
         Ok(response)
@@ -86,7 +82,7 @@ impl Client {
     pub async fn view(
         &self, 
         request: &pchain_types::rpc::ViewRequest
-    ) -> Result<pchain_types::rpc::ViewResponse, HttpErrorResponse> { 
+    ) -> Result<pchain_types::rpc::ViewResponseV1, HttpErrorResponse> { 
         let data = pchain_types::rpc::ViewRequest::serialize(request);  
         
         let raw_bytes = self
@@ -95,7 +91,7 @@ impl Client {
             .await
             .map_err(PChainClientError::new)?; 
 
-        let state_response: pchain_types::rpc::ViewResponse = pchain_types::rpc::ViewResponse::deserialize(&raw_bytes)
+        let state_response: pchain_types::rpc::ViewResponseV1 = pchain_types::rpc::ViewResponseV1::deserialize(&raw_bytes)
         .map_err(|e| PChainClientError::new(e.to_string()))?;    
 
         Ok(state_response)
@@ -181,7 +177,7 @@ impl Client {
     pub async fn block(
         &self, 
         request: &pchain_types::rpc::BlockRequest
-    ) -> Result<pchain_types::rpc::BlockResponse, HttpErrorResponse> { 
+    ) -> Result<pchain_types::rpc::BlockResponseV1, HttpErrorResponse> { 
         let data = pchain_types::rpc::BlockRequest::serialize(request);  
 
         let raw_bytes = self
@@ -190,7 +186,7 @@ impl Client {
             .await
             .map_err(PChainClientError::new)?; 
 
-        let response: pchain_types::rpc::BlockResponse = pchain_types::rpc::BlockResponse::deserialize(&raw_bytes)
+        let response: pchain_types::rpc::BlockResponseV1 = pchain_types::rpc::BlockResponseV1::deserialize(&raw_bytes)
         .map_err(|e| PChainClientError::new(e.to_string()))?;    
 
         Ok(response)
@@ -200,7 +196,7 @@ impl Client {
     pub async fn block_header(
         &self, 
         request: &pchain_types::rpc::BlockHeaderRequest
-    ) -> Result<pchain_types::rpc::BlockHeaderResponse, HttpErrorResponse> { 
+    ) -> Result<pchain_types::rpc::BlockHeaderResponseV1, HttpErrorResponse> { 
         let data = pchain_types::rpc::BlockHeaderRequest::serialize(request);  
 
         let raw_bytes = self
@@ -209,7 +205,7 @@ impl Client {
             .await
             .map_err(PChainClientError::new)?; 
 
-        let response: pchain_types::rpc::BlockHeaderResponse = pchain_types::rpc::BlockHeaderResponse::deserialize(&raw_bytes)
+        let response: pchain_types::rpc::BlockHeaderResponseV1 = pchain_types::rpc::BlockHeaderResponseV1::deserialize(&raw_bytes)
         .map_err(|e| PChainClientError::new(e.to_string()))?;    
 
         Ok(response)
@@ -271,7 +267,7 @@ impl Client {
     pub async fn transaction(
         &self, 
         request: &pchain_types::rpc::TransactionRequest
-    ) -> Result<pchain_types::rpc::TransactionResponse, HttpErrorResponse> { 
+    ) -> Result<pchain_types::rpc::TransactionResponseV1, HttpErrorResponse> { 
         let data = pchain_types::rpc::TransactionRequest::serialize(request);  
 
         let raw_bytes = self
@@ -280,7 +276,7 @@ impl Client {
             .await
             .map_err(PChainClientError::new)?; 
 
-        let response: pchain_types::rpc::TransactionResponse = pchain_types::rpc::TransactionResponse::deserialize(&raw_bytes)
+        let response: pchain_types::rpc::TransactionResponseV1 = pchain_types::rpc::TransactionResponseV1::deserialize(&raw_bytes)
         .map_err(|e| PChainClientError::new(e.to_string()))?;    
 
         Ok(response)
@@ -290,7 +286,7 @@ impl Client {
     pub async fn receipt(
         &self, 
         request: &pchain_types::rpc::ReceiptRequest
-    ) -> Result<pchain_types::rpc::ReceiptResponse, HttpErrorResponse> { 
+    ) -> Result<pchain_types::rpc::ReceiptResponseV1, HttpErrorResponse> { 
         let data = pchain_types::rpc::ReceiptRequest::serialize(request);  
 
         let raw_bytes = self
@@ -299,7 +295,7 @@ impl Client {
             .await
             .map_err(PChainClientError::new)?; 
 
-        let response: pchain_types::rpc::ReceiptResponse = pchain_types::rpc::ReceiptResponse::deserialize(&raw_bytes)
+        let response: pchain_types::rpc::ReceiptResponseV1 = pchain_types::rpc::ReceiptResponseV1::deserialize(&raw_bytes)
         .map_err(|e| PChainClientError::new(e.to_string()))?;    
 
         Ok(response)
