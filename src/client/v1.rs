@@ -9,7 +9,7 @@ use pchain_types::serialization::{Serializable, Deserializable};
 use crate::error::{ self as PChainClientError, HttpErrorResponse };
 use crate::networking::{Networking, NetworkProvider};
 
-/// Client with methods corresponding to each and every fullnode RPC V1.
+/// Client with methods corresponding to fullnode RPC V1.
 pub struct ClientV1 {
     /// `networking` denotes instance of reqwest::Client.
     networking: Networking,

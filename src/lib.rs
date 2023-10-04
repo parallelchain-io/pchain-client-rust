@@ -9,7 +9,10 @@
 //! ```no_run
 //! use pchain_client::{ClientV1, ClientV2};
 //! 
+//! // Client for RPC v1
 //! let client_v1 = ClientV1::new("https://rpc_base_url.xyz");
+//! 
+//! // Client for RPC v2
 //! let client_v2 = ClientV2::new("https://rpc_base_url.xyz");
 //! ```
 //! 

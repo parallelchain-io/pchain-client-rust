@@ -118,6 +118,7 @@ impl Networking {
     }
 }
 
+/// A trait used for Parallelchain RPC API provider setup.
 #[async_trait]
 pub trait NetworkProvider {
     /// assigns new network provider for Client.

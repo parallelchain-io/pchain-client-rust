@@ -4,17 +4,17 @@
 */
 
 //! Error handling for this library, including error printing.
-///! This transforms the http error code (integer in data type string) received from standatd code to human readable string.
-/// 
+//! This transforms the http error code (integer in data type string) received from standatd code to human readable string.
+//! 
 
-// `new` creates an ErrorResponse given an error code
-// from RPC endpoint 
-// # Arguments 
-// * `error_code` - error code received from RPC endpoint.
-// 
-// # Return
-// Error message in String.
-//
+/// `new` creates an ErrorResponse given an error code
+/// from RPC endpoint 
+/// # Arguments 
+/// * `error_code` - error code received from RPC endpoint.
+/// 
+/// # Return
+/// Error message in String.
+///
 pub(crate) fn new(error_code: String) -> HttpErrorResponse {
     match error_code.parse::<i16>() {
         Ok(err) => response(err as u16),
@@ -29,14 +29,14 @@ pub(crate) fn new(error_code: String) -> HttpErrorResponse {
     }
 }
 
-// `response` is a helper which receives an error code and sends 
-// back a human readable message to the user.
-// # Arguments 
-// * `error_code` - error code received from RPC endpoint.
-// 
-// # Return
-// Error message in String.
-// 
+/// `response` is a helper which receives an error code and sends 
+/// back a human readable message to the user.
+/// # Arguments 
+/// * `error_code` - error code received from RPC endpoint.
+/// 
+/// # Return
+/// Error message in String.
+/// 
 fn response(error_code: u16) -> HttpErrorResponse {
     match error_code {
         response_code::status400::INPUT_DECODE_FAILURE => String::from("Input query parameter is not a base64url encoded string."),
