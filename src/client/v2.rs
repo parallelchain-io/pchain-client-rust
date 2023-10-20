@@ -319,4 +319,24 @@ impl ClientV2 {
 
         Ok(response)
     }
+
+    /// `subscribe_to_transaction_events` sends request to register a websocket service for transaction events notification.
+    ///  Returns client id string for websocket connection.
+    pub async fn subscribe_to_transaction_events(
+        &self, 
+        request: &pchain_types::rpc::SubscribeToTransactionEventsRequest
+    ) -> Result<String, HttpErrorResponse> { 
+        let data = pchain_types::rpc::SubscribeToTransactionEventsRequest::serialize(request);  
+
+        let raw_bytes = self
+            .networking
+            .post_response("subscribe_to_transaction_events", data)
+            .await
+            .map_err(PChainClientError::new)?; 
+
+        let uuid = Deserializable::deserialize(&raw_bytes)
+            .map_err(|e| PChainClientError::new(e.to_string()))?;    
+
+        Ok(uuid)
+    }
 }
