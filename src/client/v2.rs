@@ -87,7 +87,7 @@ impl ClientV2 {
         
         let raw_bytes = self
             .networking
-            .post_response("view", data)
+            .post_response("view/v2", data)
             .await
             .map_err(PChainClientError::new)?; 
 
