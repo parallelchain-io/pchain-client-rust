@@ -7,24 +7,30 @@
 //! Get started by creating an instance of client. 
 //! 
 //! ```no_run
-//! use pchain_client::Client;
+//! use pchain_client::{ClientV1, ClientV2};
 //! 
-//! let client = Client::new("https://rpc_base_url.xyz");
+//! // Client for RPC v1
+//! let client_v1 = ClientV1::new("https://rpc_base_url.xyz");
+//! 
+//! // Client for RPC v2
+//! let client_v2 = ClientV2::new("https://rpc_base_url.xyz");
 //! ```
 //! 
 //! You will then be able to access each RPC through a corresponding method of the same name.
 //! 
 //! ```no_run
-//! client.submit_transaction(txn);
-//! client.block(block_request);
-//! client.state(state_request);
+//! client_v1.submit_transaction(txn);
+//! client_v1.block(block_request);
+//! client_v1.state(state_request);
 //! // etc.
 //! ```
 
-pub mod client;
-pub use client::Client;
+mod client;
+pub use client::v1::ClientV1;
+pub use client::v2::ClientV2;
 
 mod networking;
+pub use networking::NetworkProvider;
 
 mod error;
 
