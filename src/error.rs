@@ -41,6 +41,9 @@ fn response(error_code: u16) -> HttpErrorResponse {
     match error_code {
         response_code::status400::INPUT_DECODE_FAILURE => String::from("Input query parameter is not a base64url encoded string."),
         response_code::status400::INCORRECT_URL_AND_QUERY_PARAMS => String::from("Incorrect url or query parameters."),
+        response_code::status400::INCOMPATIBLE_RESPONSE => String::from("Imcompatible response of RPC version."),
+        response_code::status400::SUBSCRIBER_NOT_FOUND => String::from("The subscriber is not registered."),
+        response_code::status400::SUBSCRIBER_MAX_LIMIT_REACHED => String::from("The number of Subscribers reaches the maximun capacity."),
         response_code::status500::VIEW_SERVICE_CHANNEL_ERROR => String::from("Internal Server Error. Server busy and failed to handle new request."),
         response_code::status500::VIEW_SERVICE_REQUEST_TIMEOUT => String::from("Internal Server Error. Request Timeout"),
         _ => panic!("Irrecoverable Error. Unknown error code encountered. Please post an issue on ParallelChain Github Repository."),
@@ -52,6 +55,9 @@ pub(crate) mod response_code {
     pub(crate) mod status400 {
         pub(crate) const INPUT_DECODE_FAILURE: u16 = 0x44C;
         pub(crate) const INCORRECT_URL_AND_QUERY_PARAMS: u16 = 0x44E;
+        pub(crate)  const INCOMPATIBLE_RESPONSE: u16 = 0x45E;
+        pub(crate)  const SUBSCRIBER_NOT_FOUND: u16 = 0x46E;
+        pub(crate)  const SUBSCRIBER_MAX_LIMIT_REACHED: u16 = 0x47E;
     }
     pub(crate) mod status500{
         pub(crate) const VIEW_SERVICE_CHANNEL_ERROR: u16 = 0x57D;
