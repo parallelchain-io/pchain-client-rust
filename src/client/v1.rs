@@ -63,7 +63,7 @@ impl ClientV1 {
     pub async fn state(
         &self, 
         request: &pchain_types::rpc::StateRequest
-    ) -> Result<pchain_types::rpc::StateResponse, HttpErrorResponse> { 
+    ) -> Result<pchain_types::rpc::StateResponseV1, HttpErrorResponse> { 
         let data = pchain_types::rpc::StateRequest::serialize(request);  
         
         let raw_bytes = self
@@ -72,7 +72,7 @@ impl ClientV1 {
             .await
             .map_err(PChainClientError::new)?; 
 
-        let state_response: pchain_types::rpc::StateResponse = pchain_types::rpc::StateResponse::deserialize(&raw_bytes)
+        let state_response: pchain_types::rpc::StateResponseV1 = pchain_types::rpc::StateResponseV1::deserialize(&raw_bytes)
         .map_err(|e| PChainClientError::new(e.to_string()))?;    
 
         Ok(state_response)
