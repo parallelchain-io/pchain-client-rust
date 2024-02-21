@@ -3,7 +3,7 @@
 //!
 //! ## Getting started
 //!
-//! Get started by creating an instance of client.
+//! Get started by creating an instance of the Client.
 //!
 //! ```no_run
 //! use pchain_client::Client;
@@ -12,7 +12,7 @@
 //! let client = Client::new("https://rpc_base_url.xyz");
 //!
 //! // You will then be able to access each RPC through a corresponding method of the same name.
-//! // But be careful of distinguishing the methods of RPC V1 and RPC V2.
+//! // Do take note of using the correct method for RPCs which have v1 and v2 variations.
 //!
 //! ```no_run
 //! // RPC V1

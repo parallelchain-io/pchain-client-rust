@@ -3,13 +3,13 @@
     Licensed under the Apache License, Version 2.0: http://www.apache.org/licenses/LICENSE-2.0
 */
 
-//! HTTP networking with specific fullnodes.
+//! HTTP networking with specific fullnode.
 
 use async_trait::async_trait;
 
 /// [Networking] houses all HTTP methods used by the Client to serve responses to the user.
 pub(crate) struct Networking {
-    /// `provider` denotes current ParallelChain Fullnode Provider URL.
+    /// `provider` denotes the current ParallelChain Fullnode Provider URL.
     provider: String,
     /// `client` denotes an instance of reqwest::Client for serving HTTP requests.
     pub client: reqwest::Client,
@@ -41,14 +41,14 @@ impl Networking {
         self.provider = url.to_string();
     }
 
-    /// `get_provider` get current network provider base url.
+    /// `get_provider` get the current network provider base url.
     ///
     pub fn get_provider(&self) -> String {
         self.provider.clone()
     }
 
-    /// `is_provider_up` sends a GET request to the network provider to check if
-    /// the current provider is up.
+    /// `is_provider_up` sends a GET request to the network provider to check if the current
+    /// provider is up.
     ///
     pub async fn is_provider_up(&self) -> bool {
         let response = self.get_response("").await;
@@ -69,7 +69,7 @@ impl Networking {
         self.client.post(request_url).body(body).send().await
     }
 
-    /// `post_response` is a helper to return server side responses from HTTP `POST methods`
+    /// `post_response` is a helper to return server-side responses from HTTP `POST methods`
     /// defined in this namespace.
     /// # Arguments
     /// * `request_url` - The request URL
@@ -104,7 +104,7 @@ impl Networking {
         self.client.get(request_url).send().await
     }
 
-    /// `get_response` is a helper to return server side responses from HTTP `GET methods`
+    /// `get_response` is a helper to return server-side responses from HTTP `GET methods`
     /// defined in this namespace.
     /// # Arguments
     /// * `request_url` - The request URL

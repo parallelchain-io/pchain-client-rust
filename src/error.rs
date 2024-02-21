@@ -3,8 +3,8 @@
     Licensed under the Apache License, Version 2.0: http://www.apache.org/licenses/LICENSE-2.0
 */
 
-//! Error handling for this library, including error printing. This transforms the http error
-//! code (integer in data type string) received from standatd code to human readable string.
+//! Error handling for this library, including error printing. This transforms the HTTP error
+//! code (integer in data type string) received from standard code to human-readable string.
 
 /// `new` creates an ErrorResponse given an error code from RPC endpoint.
 /// # Arguments
@@ -26,7 +26,7 @@ pub(crate) fn new(error_code: String) -> HttpErrorResponse {
     }
 }
 
-/// `response` is a helper which receives an error code and sends back a human readable message
+/// `response` is a helper which receives an error code and sends back a human-readable message
 /// to the user.
 /// # Arguments
 /// * `error_code` - error code received from RPC endpoint.
@@ -41,7 +41,7 @@ fn response(error_code: u16) -> HttpErrorResponse {
         response_code::status400::INCOMPATIBLE_RESPONSE => String::from("Incompatible response of RPC version."),
         response_code::status500::VIEW_SERVICE_CHANNEL_ERROR => String::from("Internal Server Error. Server is busy and failed to handle new request."),
         response_code::status500::VIEW_SERVICE_REQUEST_TIMEOUT => String::from("Internal Server Error. Request Timeout."),
-        _ => panic!("Irrecoverable Error. Unknown error code encountered. Please post an issue on ParallelChain Github Repository."),
+        _ => panic!("Irrecoverable Error. Unknown error code {} encountered. Please post an issue on ParallelChain Github Repository.", error_code),
     }
 }
 
