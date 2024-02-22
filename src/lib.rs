@@ -30,5 +30,6 @@ mod client;
 pub use client::Client;
 
 mod networking;
+pub use networking::NetworkProvider;
 
 mod error;
